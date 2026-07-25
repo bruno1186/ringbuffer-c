@@ -1,0 +1,22 @@
+name: CI
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build-test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        cc: [ gcc, clang ]
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build and test (${{ matrix.cc }})
+        run: make test CC=${{ matrix.cc }}
+      - name: Build and test with AddressSanitizer
+        run: |
+          make clean
+          make test CC=${{ matrix.cc }} CFLAGS="-std=c11 -Wall -Wextra -Werror -g -fsanitize=address,undefined -Iinclude"
